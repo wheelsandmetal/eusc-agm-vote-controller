@@ -1,0 +1,5 @@
+.mypy_cache
+auth-file.json
+elections
+logs
+voters.txt
