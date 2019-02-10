@@ -45,7 +45,11 @@ def add_election(client, path, position_key):
     (_, dirs, files) = next(os.walk(path))
 
     with open(f'{path}/{files[0]}', "r") as f:
-        position = f.read()
+        text = f.read()
+
+    text = text.split('\n')
+    position = text[0]
+    order = text[1]
 
     candidates_keys = []
     for candidate in dirs:
@@ -57,6 +61,7 @@ def add_election(client, path, position_key):
         'Key': position_key,
         'Candidates_Keys': candidates_keys,
         'Active': False,
+        'Order': int(order),
     })
 
     client.put(election)
