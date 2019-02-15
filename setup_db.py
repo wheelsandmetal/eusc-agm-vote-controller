@@ -26,7 +26,7 @@ def add_candidate(client, path, candidate_key):
         with open(f'{path}/message.txt', 'r', newline='') as f:
             candidate_message = f.read()
     except:
-        candidate_message = "flip flop"
+        candidate_message = ""
 
     candidate = datastore.Entity(key)
     candidate.update({

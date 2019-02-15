@@ -9,11 +9,6 @@ from google.cloud import datastore
 os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "auth-file.json"
 
 
-def list_entities(client, entity):
-    query = client.query(kind=entity)
-    return list(query.fetch())
-
-
 def choose_election(client, elections):
     print("Which Election do you want to Run?")
     print("==================================")
@@ -87,7 +82,8 @@ if __name__ == "__main__":
     args = parser.parse_args()
     client = datastore.Client(args.project_id)
 
-    elections = list_entities(client, "Election")
+    query = client.query(kind="Election", order=["Order"])
+    elections = list(query.fetch())
 
     while True:
         election = choose_election(client, elections)
