@@ -26,26 +26,44 @@ def retrive_candidates(client, election):
 
     print("Do you need to remove any candidates? (y/n)")
     ans = str(input("> "))
-    if ans.lower() in ["n", "no"]:
-        return candidates
+    if ans.lower() in ["n", "no"]: pass
+    else:
+        print("Which Candidates do you want to remove?")
+        print("=======================================")
+        d = {}
+        for i, c in enumerate(candidates):
+            print("{}: {}".format(i + 1, c["Name"]))
+            d[i] = c
 
-    print("Which Candidates do you want to remove?")
-    print("=======================================")
-    d = {}
-    for i, c in enumerate(candidates):
-        print("{}: {}".format(i + 1, c["Name"]))
-        d[i] = c
+        candidate_indexs = input("> ").split(" ")
+        try:
+            candidate_indexs = [int(i) - 1 for i in candidate_indexs]
+        except ValueError:
+            # Assume user changed mind and doesn't want to remove
+            pass
+        else:
+            for i in candidate_indexs[::-1]:
+                client.delete(d[i].key)
+                election["Candidates_Keys"].remove(d[i].key)
+                candidates.pop(i)
 
-    candidate_indexs = input("> ").split(" ")
-    try:
-        candidate_indexs = [int(i) - 1 for i in candidate_indexs]
-    except ValueError:
-        return candidates
+            client.put(election)
 
-    for i in candidate_indexs[::-1]:
-        client.delete(d[i].key)
-        election["Candidates_Keys"].remove(d[i].key)
-        candidates.pop(i)
+    input_message = "Do you want to add any candidates? (y/n)\n> "
+    while str(input(input_message)).lower() in ['y', 'yes']:
+        input_message = "Another One? (y/n)\n> "
+
+        key = client.key('Candidate')
+        candidate = datastore.Entity(key)
+        candidate.update({
+            'Key': input('Key: '),
+            'Name': input('Name: '),
+            'Message': "",
+        })
+
+        client.put(candidate)
+        candidates.append(candidate)
+        election['Candidates_Keys'].append(candidate.key)
 
     client.put(election)
     return candidates
